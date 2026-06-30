@@ -1,2 +1,24 @@
 *.sqlite
 /.vs
+.env
+.env.local
+.env.development
+.env.staging
+.env.production
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+.DS_Store
+.vscode/
+.idea/
+
+# Keep .env.example as template
+!.env.example

@@ -63,6 +63,71 @@ DATABASE_MAX_OVERFLOW: int = 10
 PERF_DATABASE_NAME: str = "performance"
 ```
 
+### Environment Variable Configuration (.env Files)
+
+The framework supports optional `.env` files for environment-specific overrides. These files are git-ignored and should be created locally by developers.
+
+#### Available .env Files
+
+- **`.env.example`** - Template file (committed to repository)
+- **`.env`** - Local overrides (git-ignored)
+- **`.env.local`** - Local personal overrides (git-ignored)
+- **`.env.development`** - Development-specific overrides (git-ignored)
+- **`.env.staging`** - Staging-specific overrides (git-ignored)
+- **`.env.production`** - Production-specific overrides (git-ignored)
+
+#### Setting Up .env Files
+
+```bash
+# Copy the example file for your environment
+cp .env.example .env.development
+
+# Edit with your local overrides
+nano .env.development
+```
+
+#### Example .env.development
+
+```bash
+# Environment Detection
+ENVIRONMENT=development
+
+# Database Configuration (overrides Python config)
+ENV_DATABASE_HOST=10.55.236.78
+ENV_DATABASE_PASSWORD=postgres
+
+# Jenkins Configuration
+ENV_JENKINS_URL=https://osj-ngm-03-prd.cec.delllabs.net
+ENV_JENKINS_USERNAME=svc_prdsysqafw
+
+# XPOOL Configuration
+ENV_XPOOL_BINARY_PATH=/home/public/scripts/xpool_trident/dev/xpool
+```
+
+#### Configuration Precedence
+
+The framework loads configuration in this order (later sources override earlier ones):
+
+1. **Base Configuration** (`shared/config/base.py`)
+2. **Environment Configuration** (`shared/config/{environment}.py`)
+3. **Vault Configuration** (if enabled)
+4. **.env Files** (if they exist)
+5. **System Environment Variables** (ENV_* prefix)
+
+#### When to Use .env Files
+
+**Use .env files when:**
+- You need local development overrides
+- You want to keep secrets out of code
+- You need environment-specific personal settings
+- You're testing with different configurations
+
+**Don't use .env files when:**
+- The Python config files have everything you need
+- You're using Vault for secrets management
+- You prefer system environment variables
+- You want to keep configuration simple
+
 ### Jenkins Configuration
 
 Jenkins configuration is consistent across all environments to ensure unified CI/CD integration:
