@@ -28,21 +28,21 @@ class DevelopmentConfig(BaseConfig):
     HOST = "localhost"
     PORT = 5000
     
-    # Database Configuration (Development defaults)
-    DATABASE_HOST = "localhost"
+    # Database Configuration (Consistent across all environments)
+    DATABASE_HOST = "10.55.236.78"
     DATABASE_PORT = 5432
-    DATABASE_NAME = "qtest_dev"
+    DATABASE_NAME = "qTest"
     DATABASE_USER = "postgres"
     DATABASE_PASSWORD = "postgres"
-    DATABASE_SSL_MODE = "disable"
-    DATABASE_POOL_SIZE = 2
-    DATABASE_MAX_OVERFLOW = 5
+    DATABASE_SSL_MODE = "prefer"
+    DATABASE_POOL_SIZE = 5
+    DATABASE_MAX_OVERFLOW = 10
     
     # SQLAlchemy Configuration
     SQLALCHEMY_ECHO = True  # Enable SQL query logging in development
     
     # Performance Database Configuration
-    PERF_DATABASE_NAME = "performance_dev"
+    PERF_DATABASE_NAME = "performance"
     
     # Jenkins Configuration (Consistent across all environments)
     JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net"

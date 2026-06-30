@@ -31,9 +31,9 @@ class BaseConfig:
     PORT: int = 5000
     
     # Database Configuration
-    DATABASE_HOST: str = "localhost"
+    DATABASE_HOST: str = "10.55.236.78"
     DATABASE_PORT: int = 5432
-    DATABASE_NAME: str = "qtest"
+    DATABASE_NAME: str = "qTest"
     DATABASE_USER: str = "postgres"
     DATABASE_PASSWORD: str = "postgres"
     DATABASE_SSL_MODE: str = "prefer"

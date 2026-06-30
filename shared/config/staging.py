@@ -28,27 +28,27 @@ class StagingConfig(BaseConfig):
     HOST = "0.0.0.0"
     PORT = 5003
     
-    # Database Configuration (Staging database)
-    DATABASE_HOST = "staging-db.dell.com"
+    # Database Configuration (Consistent across all environments)
+    DATABASE_HOST = "10.55.236.78"
     DATABASE_PORT = 5432
-    DATABASE_NAME = "qtest_staging"
-    DATABASE_USER = "ct_engine_staging"
-    DATABASE_PASSWORD = "staging-password-from-vault"
-    DATABASE_SSL_MODE = "require"
-    DATABASE_POOL_SIZE = 10
-    DATABASE_MAX_OVERFLOW = 20
+    DATABASE_NAME = "qTest"
+    DATABASE_USER = "postgres"
+    DATABASE_PASSWORD = "postgres"
+    DATABASE_SSL_MODE = "prefer"
+    DATABASE_POOL_SIZE = 5
+    DATABASE_MAX_OVERFLOW = 10
     
     # SQLAlchemy Configuration
     SQLALCHEMY_ECHO = False  # Disable SQL query logging in staging
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 3600,
-        'pool_size': 10,
-        'max_overflow': 20
+        'pool_size': 5,
+        'max_overflow': 10
     }
     
     # Performance Database Configuration
-    PERF_DATABASE_NAME = "performance_staging"
+    PERF_DATABASE_NAME = "performance"
     
     # Jenkins Configuration (Consistent across all environments)
     JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net"

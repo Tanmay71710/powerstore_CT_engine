@@ -46,6 +46,23 @@ XPOOL_RETRY_ATTEMPTS: int = 3
 - **Staging**: 50 concurrent reservations
 - **Production**: 100 concurrent reservations
 
+### Database Configuration
+
+Database configuration is consistent across all environments to ensure unified data access:
+
+```python
+# Common database settings across all environments
+DATABASE_HOST: str = "10.55.236.78"
+DATABASE_PORT: int = 5432
+DATABASE_NAME: str = "qTest"
+DATABASE_USER: str = "postgres"
+DATABASE_PASSWORD: str = "postgres"
+DATABASE_SSL_MODE: str = "prefer"
+DATABASE_POOL_SIZE: int = 5
+DATABASE_MAX_OVERFLOW: int = 10
+PERF_DATABASE_NAME: str = "performance"
+```
+
 ### Jenkins Configuration
 
 Jenkins configuration is consistent across all environments to ensure unified CI/CD integration:
@@ -195,7 +212,7 @@ docker run -e ENV=staging myapp:staging
 - XPOOL: Development instance (`/dev/xpool`)
 - Jenkins: Production server with 120s timeout
 - Docker: Public PyPI, no reservation limits
-- Database: Local PostgreSQL, SSL disabled
+- Database: Shared PostgreSQL (10.55.236.78), SSL prefer
 - Logging: DEBUG level with verbose output
 - Kubernetes: Disabled
 - Vault: Disabled
@@ -210,7 +227,7 @@ docker run -e ENV=staging myapp:staging
 - XPOOL: Test instance (`/test/xpool`)
 - Jenkins: Production server with 300s timeout
 - Docker: Internal Artifactory, 50 reservation limit
-- Database: Staging database with SSL required
+- Database: Shared PostgreSQL (10.55.236.78), SSL prefer
 - Logging: INFO level
 - Kubernetes: Enabled with staging namespace
 - Vault: Enabled for staging secrets
@@ -225,7 +242,7 @@ docker run -e ENV=staging myapp:staging
 - XPOOL: Production instance (`/prd/xpool`)
 - Jenkins: Production server with 600s timeout
 - Docker: Internal Artifactory, 100 reservation limit
-- Database: Production database with SSL required
+- Database: Shared PostgreSQL (10.55.236.78), SSL prefer
 - Logging: WARNING level (minimal output)
 - Kubernetes: Enabled with production namespace
 - Vault: Enabled for production secrets

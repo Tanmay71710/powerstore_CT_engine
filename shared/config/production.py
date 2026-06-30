@@ -28,23 +28,23 @@ class ProductionConfig(BaseConfig):
     HOST = "0.0.0.0"
     PORT = 5003
     
-    # Database Configuration (Production database)
-    DATABASE_HOST = "prod-db.dell.com"
+    # Database Configuration (Consistent across all environments)
+    DATABASE_HOST = "10.55.236.78"
     DATABASE_PORT = 5432
-    DATABASE_NAME = "qtest"
-    DATABASE_USER = "ct_engine_prod"
-    DATABASE_PASSWORD = "production-password-from-vault"  # Must come from Vault
-    DATABASE_SSL_MODE = "require"
-    DATABASE_POOL_SIZE = 20
-    DATABASE_MAX_OVERFLOW = 40
+    DATABASE_NAME = "qTest"
+    DATABASE_USER = "postgres"
+    DATABASE_PASSWORD = "postgres"
+    DATABASE_SSL_MODE = "prefer"
+    DATABASE_POOL_SIZE = 5
+    DATABASE_MAX_OVERFLOW = 10
     
     # SQLAlchemy Configuration
     SQLALCHEMY_ECHO = False  # Never enable SQL query logging in production
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 3600,
-        'pool_size': 20,
-        'max_overflow': 40
+        'pool_size': 5,
+        'max_overflow': 10
     }
     
     # Performance Database Configuration
