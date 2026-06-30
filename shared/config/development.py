@@ -22,7 +22,7 @@ class DevelopmentConfig(BaseConfig):
     # Application Configuration
     DEBUG = True
     TESTING = True
-    SECRET_KEY = "development-secret-key-change-in-production"
+    SECRET_KEY = os.environ.get("SECRET_KEY", "development-secret-key-change-in-production")
     
     # Server Configuration
     HOST = "localhost"
@@ -38,6 +38,10 @@ class DevelopmentConfig(BaseConfig):
     DATABASE_POOL_SIZE = 5
     DATABASE_MAX_OVERFLOW = 10
     
+    # API Configuration (Development API)
+    BASE_URL = "http://ibid.usd.lab.emc.com/api/"
+    PRODUCT_FAMILY = "Cyclone"
+    
     # SQLAlchemy Configuration
     SQLALCHEMY_ECHO = True  # Enable SQL query logging in development
     
@@ -47,7 +51,7 @@ class DevelopmentConfig(BaseConfig):
     # Jenkins Configuration (Consistent across all environments)
     JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net"
     JENKINS_USERNAME = "svc_prdsysqafw"
-    JENKINS_PASSWORD = "jenkins-password-from-vault"
+    JENKINS_PASSWORD = os.environ.get("JENKINS_PASSWORD", "")
     JENKINS_TIMEOUT = 120  # Shorter timeout for development
     
     # LDAP Configuration (Development LDAP or mock)

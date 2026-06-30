@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - configmap.yaml
+
+commonLabels:
+  app: powerstore-ct-engine
+  version: "4.0.0"
+
+images:
+  - name: your-registry/ct-engine
+    newTag: latest

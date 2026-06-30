@@ -6,12 +6,18 @@ import jenkins
 from shared.log import get_logger
 import shared.utils as utils
 
-
 logger = get_logger(__name__)
 
-JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net/"
-JENKINS_USER = "svc_prdsysqafw"
-#JENKINS_PASS = utils.get_jenkins_password()
+# Try to use new configuration system, fall back to legacy
+try:
+    from shared.config_loader import get_config_dict
+    config = get_config_dict()
+    JENKINS_URL = config.get('JENKINS_URL', 'https://osj-ngm-03-prd.cec.delllabs.net/')
+    JENKINS_USER = config.get('JENKINS_USERNAME', 'svc_prdsysqafw')
+except Exception as e:
+    logger.warning(f"New configuration system not available, using legacy: {e}")
+    JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net/"
+    JENKINS_USER = "svc_prdsysqafw"
 
 
 class MyJenkins(jenkins.Jenkins):

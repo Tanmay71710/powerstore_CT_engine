@@ -22,7 +22,7 @@ class ProductionConfig(BaseConfig):
     # Application Configuration
     DEBUG = False
     TESTING = False
-    SECRET_KEY = "production-secret-key-from-vault"  # Must come from Vault
+    SECRET_KEY = os.environ.get("SECRET_KEY", "")  # Must come from environment
     
     # Server Configuration
     HOST = "0.0.0.0"
@@ -37,6 +37,10 @@ class ProductionConfig(BaseConfig):
     DATABASE_SSL_MODE = "prefer"
     DATABASE_POOL_SIZE = 5
     DATABASE_MAX_OVERFLOW = 10
+    
+    # API Configuration (Production API)
+    BASE_URL = "http://ibid.usd.lab.emc.com/api/"
+    PRODUCT_FAMILY = "Cyclone"
     
     # SQLAlchemy Configuration
     SQLALCHEMY_ECHO = False  # Never enable SQL query logging in production
@@ -53,7 +57,7 @@ class ProductionConfig(BaseConfig):
     # Jenkins Configuration (Consistent across all environments)
     JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net"
     JENKINS_USERNAME = "svc_prdsysqafw"
-    JENKINS_PASSWORD = "jenkins-password-from-vault"
+    JENKINS_PASSWORD = os.environ.get("JENKINS_PASSWORD", "")  # Must come from environment
     JENKINS_TIMEOUT = 600  # Longer timeout for production
     JENKINS_RETRY_ATTEMPTS = 5
     JENKINS_RETRY_DELAY = 10

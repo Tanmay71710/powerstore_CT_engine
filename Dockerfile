@@ -1,10 +1,16 @@
 # Build argument for environment
 ARG ENV=production
 
-# Use environment-specific base image
-FROM durjpd.artifactory.cec.lab.emc.com/vxflexos-docker-local-mw/baseimages/python:3.9.5-slim
-#FROM python:3.9-slim
-# FROM techops.artifactory.cec.lab.emc.com/techopsdrpdocker-stg-local/drpimages/python/3.9/pybuild-slim:be6f333
+# Environment-specific base images
+ARG BASE_IMAGE_DEV=python:3.9-slim
+ARG BASE_IMAGE_STAGING=durjpd.artifactory.cec.lab.emc.com/vxflexos-docker-local-mw/baseimages/python:3.9.5-slim
+ARG BASE_IMAGE_PROD=durjpd.artifactory.cec.lab.emc.com/vxflexos-docker-local-mw/baseimages/python:3.9.5-slim
+
+# Select base image dynamically based on environment
+FROM ${BASE_IMAGE_DEV}
+# To use environment-specific base images, build with:
+# docker build --build-arg ENV=staging --build-arg BASE_IMAGE=${BASE_IMAGE_STAGING} -t app:staging .
+# docker build --build-arg ENV=production --build-arg BASE_IMAGE=${BASE_IMAGE_PROD} -t app:prod .
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
@@ -25,8 +31,11 @@ RUN if [ "$ENV" = "development" ]; then \
     pip install --trusted-host pstore.artifactory.cec.lab.emc.com --extra-index-url https://pstore.artifactory.cec.lab.emc.com/artifactory/api/pypi/cyclone-pypi/simple vaultInteraction; \
     fi
 
+# Create non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser -u 1000 appuser
+
 # Copy the entire project directory to the container
-COPY . .
+COPY --chown=appuser:appuser . .
 
 # Expose the port for Flask (you can change this if needed)
 EXPOSE 5000
@@ -35,6 +44,9 @@ EXPOSE 5000
 ENV APP_NAME=app1
 ENV APP_PORT=5000
 ENV TEST_SET_NAME=""
-RUN ls -R /usr/src/app/
+
+# Switch to non-root user
+USER appuser
+
 # Command to run either app1 or app2
 ENTRYPOINT ["/bin/bash", "-c", "if [ $APP_NAME = 'manager' ]; then python manager_engine/app.py; elif [ $APP_NAME = 'monitor' ]; then python monitor_engine/app.py else python execution_engine/app.py --port $APP_PORT --test_set_name $TEST_SET_NAME; fi"]

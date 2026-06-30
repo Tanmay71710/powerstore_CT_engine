@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ct-engine-dev
+
+resources:
+  - ../../base
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "development"
+    target:
+      kind: Deployment
+      name: ct-execution
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "development"
+    target:
+      kind: Deployment
+      name: ct-manager
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "development"
+    target:
+      kind: Deployment
+      name: ct-monitor
+
+images:
+  - name: your-registry/ct-engine
+    newTag: development-latest
+
+replicas:
+  - name: ct-execution
+    count: 1
+  - name: ct-manager
+    count: 1

@@ -24,7 +24,7 @@ class BaseConfig:
     APP_VERSION: str = "4.0.0"
     DEBUG: bool = False
     TESTING: bool = False
-    SECRET_KEY: str = "change-this-secret-key-in-production"
+    SECRET_KEY: str = os.environ.get("SECRET_KEY", "change-this-secret-key-in-production")
     
     # Server Configuration
     HOST: str = "0.0.0.0"
@@ -35,10 +35,14 @@ class BaseConfig:
     DATABASE_PORT: int = 5432
     DATABASE_NAME: str = "qTest"
     DATABASE_USER: str = "postgres"
-    DATABASE_PASSWORD: str = "postgres"
+    DATABASE_PASSWORD: str = os.environ.get("DATABASE_PASSWORD", "postgres")
     DATABASE_SSL_MODE: str = "prefer"
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
+    
+    # API Configuration
+    BASE_URL: str = "http://ibid.usd.lab.emc.com/api/"
+    PRODUCT_FAMILY: str = "Cyclone"
     
     # SQLAlchemy Configuration
     SQLALCHEMY_DATABASE_URI: Optional[str] = None
@@ -66,7 +70,7 @@ class BaseConfig:
     # Jenkins Configuration
     JENKINS_URL: str = "https://osj-ngm-03-prd.cec.delllabs.net"
     JENKINS_USERNAME: str = "svc_prdsysqafw"
-    JENKINS_PASSWORD: str = "jenkins-password-from-vault"
+    JENKINS_PASSWORD: str = os.environ.get("JENKINS_PASSWORD", "")
     JENKINS_JOB_NAME: str = "Trident/test_executer"
     JENKINS_DEV_JOB_NAME: str = "Trident/dev_test_executer"
     JENKINS_TIMEOUT: int = 300

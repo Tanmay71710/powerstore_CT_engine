@@ -1,0 +1,56 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ct-engine-production
+
+resources:
+  - ../../base
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "production"
+    target:
+      kind: Deployment
+      name: ct-execution
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "production"
+    target:
+      kind: Deployment
+      name: ct-manager
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "production"
+    target:
+      kind: Deployment
+      name: ct-monitor
+
+images:
+  - name: your-registry/ct-engine
+    newTag: production-latest
+
+replicas:
+  - name: ct-execution
+    count: 3
+  - name: ct-manager
+    count: 2
+
+resourceRequirements:
+  - name: ct-execution
+    limits:
+      memory: "2Gi"
+      cpu: "2000m"
+    requests:
+      memory: "1Gi"
+      cpu: "1000m"
+  - name: ct-manager
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+    requests:
+      memory: "512Mi"
+      cpu: "500m"

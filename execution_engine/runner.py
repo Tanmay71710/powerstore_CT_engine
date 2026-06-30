@@ -13,10 +13,21 @@ from shared.utils import sort_tests_by_priority, xpool_by_labels_and_group, get_
 
 logger = get_logger(__name__)
 
-
-JOB_NAME = 'Trident/test_executer'
-DEV_JOB_NAME = 'Trident/dev_test_executer'
-XPOOL_GROUPS = 'QA-TestRunner'
+# Try to use new configuration system, fall back to legacy
+try:
+    from shared.config_loader import get_config_dict
+    from shared.environment import get_environment, Environment
+    CONFIG_SYSTEM = 'new'
+    config = get_config_dict()
+    JOB_NAME = config.get('JENKINS_JOB_NAME', 'Trident/test_executer')
+    DEV_JOB_NAME = config.get('JENKINS_DEV_JOB_NAME', 'Trident/dev_test_executer')
+    XPOOL_GROUPS = config.get('XPOOL_GROUPS', 'QA-TestRunner')
+except Exception as e:
+    logger.warning(f"New configuration system not available, using legacy: {e}")
+    CONFIG_SYSTEM = 'legacy'
+    JOB_NAME = 'Trident/test_executer'
+    DEV_JOB_NAME = 'Trident/dev_test_executer'
+    XPOOL_GROUPS = 'QA-TestRunner'
 
 
 class Runner(threading.Thread):
@@ -35,6 +46,11 @@ class Runner(threading.Thread):
             :returns: None
         """
         super(Runner, self).__init__()
+        
+        # Input validation
+        if not test_set_name:
+            raise ValueError("test_set_name cannot be empty or None")
+        
         print(test_set_name)
         self.app = app
         self.test_set_name = test_set_name 
@@ -42,12 +58,34 @@ class Runner(threading.Thread):
         self.pause_event = Event()
         self.executed_tests = []
         test_set_info = self.test_set
+        
+        # Validate test_set exists
+        if not test_set_info:
+            raise ValueError(f"Test set '{test_set_name}' not found or invalid")
+        
         logger.debug(f'At init - test_set_info: {test_set_info}')
         self.qaenv = test_set_info.get('qaenv') or '/home/trqa-dev'
-        self.xpool_groups = test_set_info.get('xpool_groups') or XPOOL_GROUPS
+        
+        # Use configuration system for XPOOL groups
+        if CONFIG_SYSTEM == 'new':
+            self.xpool_groups = test_set_info.get('xpool_groups') or config.get('XPOOL_GROUPS', 'QA-TestRunner')
+        else:
+            self.xpool_groups = test_set_info.get('xpool_groups') or XPOOL_GROUPS
+            
         self.reservation_limit = test_set_info.get('xpool_reservation_limit')
         self.federation_clusters = get_cluster_for_federation(self.xpool_groups)
-        self.is_dev = test_set_info.get('filter', {}).get('dev_test', False) == 'True'
+        
+        # Improved environment detection
+        if CONFIG_SYSTEM == 'new':
+            try:
+                environment = get_environment()
+                logger.info(f"Detected environment: {environment}")
+                self.is_dev = (environment == Environment.DEVELOPMENT)
+            except Exception as e:
+                logger.warning(f"Environment detection failed, using filter config: {e}")
+                self.is_dev = test_set_info.get('filter', {}).get('dev_test', False) == 'True'
+        else:
+            self.is_dev = test_set_info.get('filter', {}).get('dev_test', False) == 'True'
         self.pr_tester = test_set_info.get('filter', {}).get('pr_tester', False) == 'True'
         self.xpool_username = test_set_info.get('xpool_username') or 'svc_prdsysqafw'
         self.jenkinsObj = create_jenkins_object(url=test_set_info.get('jenkins_server'))

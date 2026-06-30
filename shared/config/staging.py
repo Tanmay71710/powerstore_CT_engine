@@ -22,7 +22,7 @@ class StagingConfig(BaseConfig):
     # Application Configuration
     DEBUG = False
     TESTING = False
-    SECRET_KEY = "staging-secret-key-change-in-production"
+    SECRET_KEY = os.environ.get("SECRET_KEY", "staging-secret-key-change-in-production")
     
     # Server Configuration
     HOST = "0.0.0.0"
@@ -37,6 +37,10 @@ class StagingConfig(BaseConfig):
     DATABASE_SSL_MODE = "prefer"
     DATABASE_POOL_SIZE = 5
     DATABASE_MAX_OVERFLOW = 10
+    
+    # API Configuration (Staging API)
+    BASE_URL = "http://ibid-staging.usd.lab.emc.com/api/"
+    PRODUCT_FAMILY = "Cyclone"
     
     # SQLAlchemy Configuration
     SQLALCHEMY_ECHO = False  # Disable SQL query logging in staging
@@ -53,7 +57,7 @@ class StagingConfig(BaseConfig):
     # Jenkins Configuration (Consistent across all environments)
     JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net"
     JENKINS_USERNAME = "svc_prdsysqafw"
-    JENKINS_PASSWORD = "jenkins-password-from-vault"
+    JENKINS_PASSWORD = os.environ.get("JENKINS_PASSWORD", "")
     JENKINS_TIMEOUT = 300
     JENKINS_RETRY_ATTEMPTS = 5
     

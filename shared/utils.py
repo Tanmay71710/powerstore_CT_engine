@@ -38,11 +38,22 @@ logger = get_logger(__name__)
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-BASE_URL = 'http://ibid.usd.lab.emc.com/api/'
-PRODUCT_FAMILY = 'Cyclone'
-
-BASE_XPOOL_CMD = '/home/public/scripts/xpool_trident/prd/xpool'
-XPOOL_LIST_CND = '/home/public/scripts/xpool_trident/prd/xpool list -x -a'
+# Try to use new configuration system, fall back to legacy
+try:
+    from shared.config_loader import get_config_dict
+    CONFIG_SYSTEM = 'new'
+    config = get_config_dict()
+    BASE_URL = config.get('BASE_URL', 'http://ibid.usd.lab.emc.com/api/')
+    PRODUCT_FAMILY = 'Cyclone'
+    BASE_XPOOL_CMD = config.get('XPOOL_BINARY_PATH', '/home/public/scripts/xpool_trident/prd/xpool')
+    XPOOL_LIST_CND = config.get('XPOOL_BINARY_PATH', '/home/public/scripts/xpool_trident/prd/xpool') + ' list -x -a'
+except Exception as e:
+    logger.warning(f"New configuration system not available, using legacy: {e}")
+    CONFIG_SYSTEM = 'legacy'
+    BASE_URL = 'http://ibid.usd.lab.emc.com/api/'
+    PRODUCT_FAMILY = 'Cyclone'
+    BASE_XPOOL_CMD = '/home/public/scripts/xpool_trident/prd/xpool'
+    XPOOL_LIST_CND = '/home/public/scripts/xpool_trident/prd/xpool list -x -a'
 
 VICTORY_PLUS = "Victory-Plus V4.1.0"
 BAZELET = "IRC-1 V4.2.0 Bazelet"

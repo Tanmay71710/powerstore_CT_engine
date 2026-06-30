@@ -1,0 +1,273 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ct-execution
+  labels:
+    app: ct-execution
+    component: execution-engine
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ct-execution
+  template:
+    metadata:
+      labels:
+        app: ct-execution
+        component: execution-engine
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: ct-execution
+        image: your-registry/ct-engine:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+          name: http
+          protocol: TCP
+        env:
+        - name: ENVIRONMENT
+          value: "development"
+        - name: APP_NAME
+          value: "execution"
+        - name: APP_PORT
+          value: "5000"
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_host
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_port
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_name
+        - name: DATABASE_USER
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_user
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ct-db-secret
+              key: database_password
+        - name: JENKINS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: jenkins_url
+        - name: JENKINS_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: jenkins_username
+        - name: JENKINS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ct-jenkins-secret
+              key: jenkins_password
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ct-app-secret
+              key: secret_key
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ct-manager
+  labels:
+    app: ct-manager
+    component: manager-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ct-manager
+  template:
+    metadata:
+      labels:
+        app: ct-manager
+        component: manager-engine
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: ct-manager
+        image: your-registry/ct-engine:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5002
+          name: http
+          protocol: TCP
+        env:
+        - name: ENVIRONMENT
+          value: "development"
+        - name: APP_NAME
+          value: "manager"
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_host
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_port
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_name
+        - name: DATABASE_USER
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_user
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ct-db-secret
+              key: database_password
+        - name: JENKINS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: jenkins_url
+        - name: JENKINS_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: jenkins_username
+        - name: JENKINS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ct-jenkins-secret
+              key: jenkins_password
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ct-app-secret
+              key: secret_key
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5002
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ct-monitor
+  labels:
+    app: ct-monitor
+    component: monitor-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ct-monitor
+  template:
+    metadata:
+      labels:
+        app: ct-monitor
+        component: monitor-engine
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: ct-monitor
+        image: your-registry/ct-engine:latest
+        imagePullPolicy: Always
+        env:
+        - name: ENVIRONMENT
+          value: "development"
+        - name: APP_NAME
+          value: "monitor"
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_host
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_port
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_name
+        - name: DATABASE_USER
+          valueFrom:
+            configMapKeyRef:
+              name: ct-config
+              key: database_user
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ct-db-secret
+              key: database_password
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
