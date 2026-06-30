@@ -1,0 +1,28 @@
+ldap3
+kubernetes
+python-jenkins
+marshmallow==3.22.0
+marshmallow-sqlalchemy==1.1.0
+flask-marshmallow==1.2.1
+flask-restx==1.3.0
+flask-swagger-ui==4.11.1
+Flask==3.0.3
+psycopg2-binary
+Flask-Cors==5.0.0
+Flask-Migrate==4.0.7
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.34
+
+# Configuration Management Dependencies
+pydantic==2.5.0
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+python-decouple==3.8
+pyyaml==6.0.1
+
+# Vault Integration
+hvac==2.1.0
+
+# Feature Flags (optional - can be added later)
+# unleash-client==4.0.0
+# launchdarkly-server-sdk==8.0.0

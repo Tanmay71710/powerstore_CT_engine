@@ -1,0 +1,19 @@
+apiVersion: v1
+clusters:
+- cluster:
+    insecure-skip-tls-verify: true
+    server: https://api.common-prod-drm.k8s.cec.delllabs.net:6443
+  name: api-common-prod-drm-k8s-cec-delllabs-net:6443
+contexts:
+- context:
+    cluster: api-common-prod-drm-k8s-cec-delllabs-net:6443
+    namespace: isg-pse-sysqa-prd
+    user: system:serviceaccount:isg-pse-sysqa-prd:sysqa-serviceaccount/api-common-prod-drm-k8s-cec-delllabs-net:6443
+  name: isg-pse-sysqa-prd/api-common-prod-drm-k8s-cec-delllabs-net:6443/system:serviceaccount:isg-pse-sysqa-prd:sysqa-serviceaccount
+current-context: isg-pse-sysqa-prd/api-common-prod-drm-k8s-cec-delllabs-net:6443/system:serviceaccount:isg-pse-sysqa-prd:sysqa-serviceaccount
+kind: Config
+preferences: {}
+users:
+- name: system:serviceaccount:isg-pse-sysqa-prd:sysqa-serviceaccount/api-common-prod-drm-k8s-cec-delllabs-net:6443
+  user:
+    token: eyJhbGciOiJSUzI1NiIsImtpZCI6IlpDS1QtUHhQUW4xX3MwNVhuVVpQeWJGcFRMeklENENlVmFlNWxKN1k1eEEifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJpc2ctcHNlLXN5c3FhLXByZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJzeXNxYS1zZXJ2aWNlYWNjb3VudC10b2tlbi1scDhuaCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJzeXNxYS1zZXJ2aWNlYWNjb3VudCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImVjNjFiZGJlLTkxOWYtNDE3ZC04ZTZmLWNiMGUwYzM4NmYwMCIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDppc2ctcHNlLXN5c3FhLXByZDpzeXNxYS1zZXJ2aWNlYWNjb3VudCJ9.BnFKuzJUuPUQljZu_C5HlUa6LfdXacBtdO7y3EwnBjRyzweTMP5phC0CepFufIGtc-uJzEu0L0b5ZoETbdHYVVEodbyyeCW-PGPtygxYNBa5O8IhNcRTClkjeCknKsU9vKS9W9Ne0_lPXtuzhg7CWZnHuRAVfSPYLD2YRl0tIbKXoBlsIXndFTcGLZkVgwsy326hrrccsRUK9Uu5Xvu-9bmRk5Tia40mo36HSBDrDl6zpbauaiUzEzuNin36gI5Gq9ZAjWI0crDpKCjNEz4Gdx9L_nViKN8IKZ4EnOYgLuoh4MX9ROvrw7sbYqLLVUGngJeyA-33sv4a8yRQSEMEtTXx4hOawUtLfCA-8woErNFIyOcKIVEdgSILGZZXAruM-ye2znjU8mVr_8v0ySZdYVftTFj8qbBIOaEkg-hl9na-LykknOwwjiGTZBmR0dykTiRSQE5VeP0W9uzuqpg9cQ1uArDlPFEqNo-WrrFxXGOkz3uSuuzePEyTpiZmF0WRETXe8n91SLGBVOq3bxZl93v5yairHZQuVLX6xx8h-96d86Wm51QhRQxM6HGVpooSeShXD08PbxnEy33jjqN6YQsgxnuJZxOUErxYaOjRs0FnhyxcgKwrJSKqSlr4_c0Pt12WYYSkQd3doS9LPVPXLIvahmddvhc1ng86idKB3V0

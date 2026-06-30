@@ -1,0 +1,664 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Test Plan and Test Set API",
+        "version": "1.0.0",
+        "title": "Test Plan and Test Set API"
+    },
+    "basePath": "/",
+    "paths": {
+        "/testplans": {
+            "get": {
+                "summary": "Get test plans",
+                "description": "Get a list of test plans",
+                "parameters": [
+                    {
+                        "name": "test_status",
+                        "in": "query",
+                        "type": "string",
+                        "description": "Filter by test status"
+                    },
+                    {
+                        "name": "release",
+                        "in": "query",
+                        "type": "string",
+                        "description": "Filter by release"
+                    },
+                    {
+                        "name": "responsible_team",
+                        "in": "query",
+                        "type": "string",
+                        "description": "Filter by responsible team"
+                    },
+                    {
+                        "name": "run_id",
+                        "in": "query",
+                        "type": "integer",
+                        "description": "Filter by test run ID"
+                    },
+                    {
+                        "name": "testcase_id",
+                        "in": "query",
+                        "type": "integer",
+                        "description": "Filter by Test case ID"
+                    },
+                    {
+                        "name": "test_level",
+                        "in": "query",
+                        "type": "string",
+                        "description": "Filter by Test case level"
+                    },
+                    {
+                        "name": "execution_priority",
+                        "in": "query",
+                        "type": "number",
+                        "format": "float",
+                        "description": "Filter by execution priority (0-10)"
+                    },
+                    {
+                        "name": "is_ct",
+                        "in": "query",
+                        "type": "boolean",
+                        "description": "Filter by is continuous testing category"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A list of test plans",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/TestPlan"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid query parameters."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/execute_test_set/{test_set_name}": {
+            "post": {
+                "summary": "Execute a Test Set by name",
+                "description": "Triggers the runner to execute the specified Test Set by its name and returns the service details.",
+                "parameters": [
+                    {
+                        "name": "test_set_name",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "description": "The name of the Test Set to execute."
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Additional configuration for executing the Test Set.",
+                        "required": false,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "qaenv": {
+                                    "type": "string",
+                                    "description": "The qaenv to use when running the Test Set."
+                                }
+                            },
+                            "example": {
+                                "qaenv": "/home/trqa-dev"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The Test Set runner was successfully triggered and the service details are returned.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "format": "ipv4",
+                                    "description": "The IP address of the service running the Test Set."
+                                },
+                                "port": {
+                                    "type": "integer",
+                                    "description": "The port number of the service."
+                                },
+                                "service_url": {
+                                    "type": "string",
+                                    "description": "The full URL of the service (IP and port combined)."
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The specified Test Set was not found."
+                    },
+                    "500": {
+                        "description": "Internal server error during runner initiation."
+                    }
+                }
+            }
+        },
+        "/stop_test_set/{test_set_name}": {
+            "post": {
+                "summary": "Stop Test Set execution by name",
+                "description": "Stops the execution of an existing Test Set by its name.",
+                "parameters": [
+                    {
+                        "name": "test_set_name",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "description": "The name of the Test Set to stop."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Test Set execution stopped and deleted successfully.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Confirmation message for stopping the Test Set."
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The specified Test Set was not found."
+                    },
+                    "500": {
+                        "description": "Internal server error during the stop process."
+                    }
+                }
+            }
+        },
+        "/testsets": {
+            "post": {
+                "summary": "Create a new Test Set",
+                "description": "Create a new Test Set with filters, a list of tests, priority rules, and server details.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Test Set object",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TestSetCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Test Set created successfully.",
+                        "schema": {
+                            "$ref": "#/definitions/TestSet"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request. Ensure all required fields are provided."
+                    },
+                    "500": {
+                        "description": "Internal server error while creating the Test Set."
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get all Test Sets",
+                "description": "Retrieve a list of all existing Test Sets.",
+                "responses": {
+                    "200": {
+                        "description": "A list of Test Sets.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/TestSet"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error while retrieving Test Sets."
+                    }
+                }
+            }
+        },
+        "/testsets/{test_set_name}": {
+            "get": {
+                "summary": "Get a Test Set by name",
+                "description": "Retrieve details of a Test Set by its unique name.",
+                "parameters": [
+                    {
+                        "name": "test_set_name",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "description": "The name of the Test Set to retrieve."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The requested Test Set.",
+                        "schema": {
+                            "$ref": "#/definitions/TestSet"
+                        }
+                    },
+                    "404": {
+                        "description": "Test Set not found."
+                    },
+                    "500": {
+                        "description": "Internal server error while retrieving the Test Set."
+                    }
+                }
+            },
+            "put": {
+                "summary": "Modify a Test Set by name",
+                "description": "Modify an existing Test Set by its unique name.",
+                "parameters": [
+                    {
+                        "name": "test_set_name",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "description": "The name of the Test Set to modify."
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The updated Test Set object.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TestSetModify"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Test Set modified successfully."
+                    },
+                    "404": {
+                        "description": "Test Set not found."
+                    },
+                    "400": {
+                        "description": "Invalid request. Ensure all required fields are provided."
+                    },
+                    "500": {
+                        "description": "Internal server error while modifying the Test Set."
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a Test Set by name",
+                "description": "Delete an existing Test Set by its unique name.",
+                "parameters": [
+                    {
+                        "name": "test_set_name",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "description": "The name of the Test Set to delete."
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Test Set deleted successfully."
+                    },
+                    "404": {
+                        "description": "Test Set not found."
+                    },
+                    "500": {
+                        "description": "Internal server error while deleting the Test Set."
+                    }
+                }
+            }
+        },
+        "/testset_execution": {
+            "get": {
+                "summary": "Get all test sets execution",
+                "description": "Retrieve a list of all test sets execution",
+                "responses": {
+                    "200": {
+                        "description": "A list of test case executions and status",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/TestExecution"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/testset_execution/{name}/add_server": {
+            "put": {
+                "summary": "Add server to TestSet",
+                "description": "Add the IP and port of the test execution service. Optionally includes `qaenv` for environment specification.",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "description": "The name of the test set execution."
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "A dictionary containing IP, port, and optionally qaenv.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AddServer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Server added to the TestSet.",
+                        "schema": {
+                            "$ref": "#/definitions/ServerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or missing fields."
+                    },
+                    "404": {
+                        "description": "TestSetExecution not found."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "TestPlan": {
+            "type": "object",
+            "properties": {
+                "parent_id": {
+                    "type": "integer",
+                    "description": "The parent ID of the test run."
+                },
+                "testcase_id": {
+                    "type": "integer",
+                    "description": "The ID of the test case."
+                },
+                "run_id": {
+                    "type": "integer",
+                    "description": "The unique identifier for the test run."
+                },
+                "run_name": {
+                    "type": "string",
+                    "description": "The name of the test run."
+                },
+                "pid": {
+                    "type": "string",
+                    "description": "The unique process ID of the test run."
+                },
+                "created_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date and time when the test run was created."
+                },
+                "last_modified_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date and time when the test run was last modified."
+                },
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Additional properties or metadata for the test run."
+                },
+                "test_case_version_id": {
+                    "type": "integer",
+                    "description": "The version ID of the test case."
+                },
+                "test_case_version": {
+                    "type": "string",
+                    "description": "The version of the test case."
+                },
+                "target_release": {
+                    "type": "string",
+                    "description": "The target release for the test run."
+                },
+                "release": {
+                    "type": "string",
+                    "description": "The release associated with the test run."
+                },
+                "testcase_pid": {
+                    "type": "string",
+                    "description": "The PID of the test case."
+                },
+                "is_ct": {
+                    "type": "boolean",
+                    "description": "Indicates if the test run is part of continuous testing."
+                }
+            }
+        },
+        "AddServer": {
+            "type": "object",
+            "required": [
+                "ip",
+                "port"
+            ],
+            "properties": {
+                "ip": {
+                    "type": "string",
+                    "format": "ipv4",
+                    "description": "The IP address of the server."
+                },
+                "port": {
+                    "type": "integer",
+                    "description": "The port of the server."
+                },
+                "qaenv": {
+                    "type": "string",
+                    "description": "Optional environment configuration for QA execution."
+                }
+            },
+            "example": {
+                "ip": "192.168.1.10",
+                "port": 8080,
+                "qaenv": "/home/trqa-dev"
+            }
+        },
+        "ServerResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "description": "Response message."
+                },
+                "server": {
+                    "type": "object",
+                    "description": "Details of the added server.",
+                    "properties": {
+                        "ip": {
+                            "type": "string",
+                            "format": "ipv4"
+                        },
+                        "port": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "test_set_name": {
+                    "type": "string",
+                    "description": "The name of the test set execution."
+                }
+            },
+            "example": {
+                "message": "Server added successfully.",
+                "server": {
+                    "ip": "192.168.1.10",
+                    "port": 8080
+                },
+                "test_set_name": "my_test_set"
+            }
+        },
+        "TestSetCreate": {
+            "type": "object",
+            "required": [
+                "name",
+                "tests",
+                "priority_rule",
+                "server"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The unique name of the Test Set."
+                },
+                "filter": {
+                    "type": "object",
+                    "description": "Optional filters for selecting tests."
+                },
+                "xpool_groups": {
+                    "type": "string",
+                    "description": "Xpool groups to use for the test set."
+                },
+                "xpool_username": {
+                    "type": "string",
+                    "description": "Xpool username to use for the test set."
+                },
+                "xpool_reservation_limit": {
+                    "type": "integer",
+                    "description": "Max number of clusters to use."
+                },
+                "tests": {
+                    "type": "array",
+                    "description": "A list of test cases to include in the Test Set.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "priority_rule": {
+                    "type": "object",
+                    "description": "Priority rules for executing the tests."
+                },
+                "execuation_time_zone": {
+                    "type": "string",
+                    "description": "country ('IL', 'US', etc.) to limit execuation on the working hours"
+                },
+                "jenkins_server": {
+                    "type": "string",
+                    "description": "jenkins server to run the jobs on (DEBUG ONLY)."
+                },
+                "server": {
+                    "type": "object",
+                    "description": "Details of the server running the Test Set.",
+                    "properties": {
+                        "ip": {
+                            "type": "string",
+                            "format": "ipv4",
+                            "description": "The IP address of the server."
+                        },
+                        "port": {
+                            "type": "integer",
+                            "description": "The port number of the server."
+                        }
+                    }
+                }
+            }
+        },
+        "TestSet": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The unique name of the Test Set."
+                },
+                "filter": {
+                    "type": "object",
+                    "description": "Optional filters for selecting tests."
+                },
+                "tests": {
+                    "type": "array",
+                    "description": "A list of test cases included in the Test Set.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "priority_rule": {
+                    "type": "object",
+                    "description": "Priority rules for executing the tests."
+                },
+                "execuation_time_zone": {
+                    "type": "string",
+                    "description": "country ('IL', 'US', etc.) to limit execuation on the working hours"
+                },
+                "xpool_username": {
+                    "type": "string",
+                    "description": "Xpool username to use for the test set."
+                },
+                "jenkins_server": {
+                    "type": "string",
+                    "description": "jenkins server to run the jobs on (DEBUG ONLY)."
+                },
+                "server": {
+                    "type": "object",
+                    "description": "Details of the server running the Test Set.",
+                    "properties": {
+                        "ip": {
+                            "type": "string",
+                            "format": "ipv4",
+                            "description": "The IP address of the server."
+                        },
+                        "port": {
+                            "type": "integer",
+                            "description": "The port number of the server."
+                        }
+                    }
+                }
+            }
+        },
+        "TestExecution": {
+            "type": "object",
+            "example": {
+                "name": "execution_New Test Set2",
+                "test_set_name": null,
+                "tests": []
+            }
+        },
+        "TestSetModify": {
+            "type": "object",
+            "properties": {
+                "filter": {
+                    "type": "object",
+                    "description": "Optional filters for selecting tests."
+                },
+                "tests": {
+                    "type": "array",
+                    "description": "The updated list of test cases included in the Test Set.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "priority_rule": {
+                    "type": "object",
+                    "description": "Updated priority rules for executing the tests."
+                },
+                "server": {
+                    "type": "object",
+                    "description": "Updated details of the server running the Test Set.",
+                    "properties": {
+                        "ip": {
+                            "type": "string",
+                            "format": "ipv4",
+                            "description": "The IP address of the server."
+                        },
+                        "port": {
+                            "type": "integer",
+                            "description": "The port number of the server."
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

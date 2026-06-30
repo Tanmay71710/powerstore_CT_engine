@@ -1,0 +1,39 @@
+{
+  "description": "Template for real values to replace dummy values in the codebase",
+  "note": "Fill in the actual values for your environment and use this file with update_dummy_values.py --config-file real_values_template.json",
+  "development": {
+    "DATABASE_HOST": "localhost",
+    "DATABASE_USER": "postgres",
+    "DATABASE_PASSWORD": "your_dev_password",
+    "JENKINS_URL": "http://localhost:8080",
+    "JENKINS_USERNAME": "admin",
+    "JENKINS_PASSWORD": "your_jenkins_password",
+    "VAULT_URL": "http://localhost:8200",
+    "SECRET_KEY": "generate-a-secure-secret-key",
+    "REDIS_URL": "redis://localhost:6379/0"
+  },
+  "staging": {
+    "DATABASE_HOST": "staging-db.dell.com",
+    "DATABASE_USER": "ct_engine_staging",
+    "DATABASE_PASSWORD": "staging-password-from-vault",
+    "JENKINS_URL": "https://staging-jenkins.dell.com",
+    "JENKINS_USERNAME": "ct-engine-staging",
+    "JENKINS_PASSWORD": "staging-jenkins-password-from-vault",
+    "VAULT_URL": "https://staging-vault.dell.com",
+    "SECRET_KEY": "staging-secret-key-from-vault",
+    "REDIS_URL": "redis://staging-redis.dell.com:6379/0",
+    "EMAIL_ADMIN": "staging-team@dell.com"
+  },
+  "production": {
+    "DATABASE_HOST": "prod-db.dell.com",
+    "DATABASE_USER": "ct_engine_prod",
+    "DATABASE_PASSWORD": "production-password-from-vault",
+    "JENKINS_URL": "https://osj-ngm-03-prd.cec.delllabs.net",
+    "JENKINS_USERNAME": "svc_prdsysqafw",
+    "JENKINS_PASSWORD": "production-jenkins-password-from-vault",
+    "VAULT_URL": "https://production-vault.dell.com",
+    "SECRET_KEY": "production-secret-key-from-vault",
+    "REDIS_URL": "redis://prod-redis.dell.com:6379/0",
+    "EMAIL_ADMIN": "prod-team@dell.com"
+  }
+}

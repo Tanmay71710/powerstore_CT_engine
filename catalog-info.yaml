@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: powerstore_CT_engine
+  annotations:
+    github.com/project-slug: freinm1/powerstore_CT_engine
+spec:
+  type: other
+  lifecycle: unknown
+  owner: freinm1

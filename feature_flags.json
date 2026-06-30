@@ -1,0 +1,58 @@
+{
+  "new_ui": {
+    "enabled": true,
+    "environments": ["development", "staging"],
+    "rollout_percentage": 100,
+    "description": "Enable new user interface",
+    "target_users": [],
+    "dependencies": []
+  },
+  "advanced_monitoring": {
+    "enabled": false,
+    "environments": ["production"],
+    "rollout_percentage": 10,
+    "description": "Enable advanced monitoring features",
+    "target_users": [],
+    "dependencies": []
+  },
+  "kubernetes_scaling": {
+    "enabled": true,
+    "environments": ["staging", "production"],
+    "rollout_percentage": 100,
+    "description": "Enable Kubernetes-based scaling",
+    "target_users": [],
+    "dependencies": []
+  },
+  "parallel_test_execution": {
+    "enabled": false,
+    "environments": ["development", "staging"],
+    "rollout_percentage": 50,
+    "description": "Enable parallel test execution",
+    "target_users": ["test-team@dell.com", "qa-team@dell.com"],
+    "dependencies": ["advanced_monitoring"]
+  },
+  "smart_cluster_allocation": {
+    "enabled": true,
+    "environments": ["production"],
+    "rollout_percentage": 25,
+    "description": "Enable AI-powered cluster allocation",
+    "target_users": [],
+    "dependencies": []
+  },
+  "real_time_analytics": {
+    "enabled": false,
+    "environments": ["staging"],
+    "rollout_percentage": 100,
+    "description": "Enable real-time analytics dashboard",
+    "target_users": [],
+    "dependencies": []
+  },
+  "automated_test_triage": {
+    "enabled": false,
+    "environments": ["production"],
+    "rollout_percentage": 0,
+    "description": "Enable automated test failure triage",
+    "target_users": [],
+    "dependencies": ["advanced_monitoring", "smart_cluster_allocation"]
+  }
+}

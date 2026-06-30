@@ -1,0 +1,125 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API documentation for execution routes",
+        "version": "1.0.0",
+        "title": "Execution API"
+    },
+    "basePath": "/",
+    "tags": [
+        {
+            "name": "execution",
+            "description": "Operations related to execution"
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/start": {
+            "post": {
+                "tags": [
+                    "execution"
+                ],
+                "summary": "Start execution",
+                "description": "Starts the execution process and checks the pause event status",
+                "operationId": "startExecution",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Execution started successfully"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/pause": {
+            "post": {
+                "tags": [
+                    "execution"
+                ],
+                "summary": "Pause execution",
+                "description": "Sets the pause event to pause the execution process",
+                "operationId": "pauseExecution",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Execution paused successfully"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/resume": {
+            "post": {
+                "tags": [
+                    "execution"
+                ],
+                "summary": "Resume execution",
+                "description": "clear the pause event to resume the execution process",
+                "operationId": "resumeExecution",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Execution resumed successfully"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/stop": {
+            "post": {
+                "tags": [
+                    "execution"
+                ],
+                "summary": "Stop execution",
+                "description": "Stops the execution process",
+                "operationId": "stopExecution",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Execution stopped successfully"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/is_alive": {
+            "get": {
+                "tags": [
+                    "execution"
+                ],
+                "summary": "is alive",
+                "description": "is_alive",
+                "operationId": "is_alive",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Execution stopped successfully"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        }
+    }
+}

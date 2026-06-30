@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Runner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+    function toggleClusterDecision() {
+        var wantsCluster = document.getElementById("cluster-yes").checked;
+        var clusterSection = document.getElementById("cluster-section");
+        var ibidSection = document.getElementById("ibid-section");
+        var xpoolSection = document.getElementById("xpool-section");
+        var submitBtn = document.getElementById("submit-btn");
+
+        if (wantsCluster) {
+            clusterSection.style.display = "block";
+            ibidSection.style.display = "block";
+            xpoolSection.style.display = "none";
+            submitBtn.disabled = true;
+        } else {
+            clusterSection.style.display = "none";
+            ibidSection.style.display = "block";
+            xpoolSection.style.display = "block";
+            submitBtn.disabled = false;
+        }
+    }
+    function checkClusterAvailability() {
+        var clusterName = document.getElementById("cluster-name").value;
+        var testId = document.querySelector("input[name='test_id']").value;
+        var checkBtn = document.getElementById("check-cluster-btn");
+        var submitBtn = document.getElementById("submit-btn");
+        var clusterStatus = document.getElementById("cluster-status");
+
+        checkBtn.disabled = true;
+        clusterStatus.innerHTML = "Checking...";
+        clusterStatus.className = "checking";
+
+        fetch(`/check-cluster?cluster_name=${clusterName}&test_id=${testId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.suitable) {
+                    clusterStatus.innerHTML = "✔ Cluster is suitable!";
+                    clusterStatus.className = "success-message";
+                    submitBtn.disabled = false;
+                } else {
+                    clusterStatus.innerHTML = "✖ Cluster not suitable!";
+                    clusterStatus.className = "error-message";
+                    submitBtn.disabled = true;
+                }
+                checkBtn.disabled = false;
+            })
+            .catch(error => {
+                clusterStatus.innerHTML = "⚠ Error checking cluster!";
+                clusterStatus.className = "error-message";
+                checkBtn.disabled = false;
+                submitBtn.disabled = true;
+            });
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector("form");
+        const submitBtn = document.getElementById("submit-btn");
+        const jobLinkContainer = document.getElementById("job-link-container");
+        const jobLink = document.getElementById("job-link");
+        const errorMessageContainer = document.getElementById("error-message");
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            jobLinkContainer.classList.add("hidden");
+            errorMessageContainer.classList.add("hidden");
+            errorMessageContainer.innerHTML = "";
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Re-run Test";
+
+                if (data.job_url) {
+                    jobLink.href = data.job_url;
+                    jobLink.innerText = "Click here to view the job";
+                    jobLinkContainer.classList.remove("hidden");
+                } else if (data.error) {
+                    errorMessageContainer.innerHTML = `<p>${data.error}</p>`;
+                    errorMessageContainer.classList.remove("hidden");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                errorMessageContainer.innerHTML = "<p>Failed to submit the request. Please try again.</p>";
+                errorMessageContainer.classList.remove("hidden");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Re-run Test";
+            });
+        });
+    });
+</script>
+</head>
+<body>
+    <h1>Test Runner</h1>
+    <form action="{{ url_for('shared.rerun_test_submit') }}" method="post">
+        <input type="hidden" name="test_id" value="{{ test_id }}">
+
+        <label class="label" for="username">Username:</label>
+
+        <input type="text" id="username" name="username" required class="input-field">
+
+        <hr>
+
+        <h3 class="section-title">Test Configuration</h3>
+
+        <label class="label">Do you want to provide a cluster?</label>
+
+        <div class="radio-group">
+            <label class="label"><input type="radio" id="cluster-yes" name="cluster-decision" value="yes" onchange="toggleClusterDecision()"> Yes</label>
+            <label class="label"><input type="radio" id="cluster-no" name="cluster-decision" value="no" onchange="toggleClusterDecision()"> No</label>
+        </div>
+
+        <div id="cluster-section" style="display: none;">
+            <label class="label" for="cluster-name">Cluster Name:</label>
+            <input type="text" id="cluster-name" name="cluster-name" class="input-field">
+            <button type="button" id="check-cluster-btn" class="button" onclick="checkClusterAvailability()">Check Cluster Compatibility</button>
+
+            <p id="cluster-status" class="hidden-message"></p>
+        </div>
+
+        <div id="ibid-section">
+            <label class="label" for="ibid">IBID:</label>
+            <input type="text" id="ibid" name="ibid" class="input-field">
+        </div>
+
+        <div id="xpool-section">
+            <label class="label" for="xpool-groups">XPOOL GROUPS:</label>
+            <input type="text" id="xpool-groups" name="xpool-groups" class="input-field">
+            <p><i>Note: The XPOOL GROUPS syntax should be <b>group1,group2</b> (no spaces).</i></p>
+        </div>
+        <hr>
+
+        <button type="submit" id="submit-btn" class="button" disabled>Re-run Test</button>
+
+        <div id="job-link-container" class="hidden">
+            <p><b>Jenkins Job Started Successfully!</b></p>
+            <p><a id="job-link" href="#" target="_blank"></a></p>
+        </div>
+
+        <div id="error-message" class="hidden"></div>
+    </form>
+
+    <div class="notes">
+        <h3 class="notes-title">Notes</h3>
+
+        <p>All fields must be correctly filled before submitting the test.</p>
+
+        <p>XPOOL GROUPS should follow the correct syntax.</p>
+
+        {% if xpool_labels is not none %}
+        <p><b>Test-Specific Information:</b></p>
+        <p><i>XPOOL_LABELS for this test: <b>{{ xpool_labels }}</b></i></p>
+        {% endif %}
+
+        <p><b>Cluster Selection Process</b></p>
+
+        <p>
+            - If the user chooses to provide a <b>cluster</b>, the system will first check if the cluster is suitable for the test.<br>
+            - If the cluster is valid, the user can <b>optionally provide an IBID.</b><br>
+            - If the user chooses <b>NOT to provide a cluster</b>, they <b>must</b> provide <b>XPOOL GROUPS</b> and an <b>IBID</b>.<br>
+            - The selected cluster must include the required <b>XPOOL LABELS</b> to be valid.
+        </p>
+
+        <p>For any questions, please contact:</p>
+
+        <p>
+            <a href="mailto:gilad.rahamim@dell.com">Gilad Rahamim</a>,
+            <a href="mailto:moshe.freind@dell.com">Moshe Freind</a>,
+            <a href="mailto:muhammad.odetallah@dell.com">Muhammad Odetallah</a>
+        </p>
+
+        <p>Regards,</p>
+        <p>Test Runner Team</p>
+    </div>
+</body>
+</html>
