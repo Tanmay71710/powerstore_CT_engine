@@ -11,14 +11,16 @@ __pycache__/
 *.pyd
 .Python
 *.so
-*.egg
-*.egg-info/
+.egg
+.egg-info/
 dist/
 build/
 *.log
 .DS_Store
 .vscode/
 .idea/
+venv/
+.pytest_cache/
 
 # Keep .env.example as template
 !.env.example
