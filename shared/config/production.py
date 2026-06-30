@@ -50,10 +50,10 @@ class ProductionConfig(BaseConfig):
     # Performance Database Configuration
     PERF_DATABASE_NAME = "performance"
     
-    # Jenkins Configuration (Production Jenkins)
+    # Jenkins Configuration (Consistent across all environments)
     JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net"
     JENKINS_USERNAME = "svc_prdsysqafw"
-    JENKINS_PASSWORD = "production-jenkins-password-from-vault"  # Must come from Vault
+    JENKINS_PASSWORD = "jenkins-password-from-vault"
     JENKINS_TIMEOUT = 600  # Longer timeout for production
     JENKINS_RETRY_ATTEMPTS = 5
     JENKINS_RETRY_DELAY = 10

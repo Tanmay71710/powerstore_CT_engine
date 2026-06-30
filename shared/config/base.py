@@ -64,9 +64,9 @@ class BaseConfig:
     TESTINIT_STAMP_TABLE: str = "testinit_stamp"
     
     # Jenkins Configuration
-    JENKINS_URL: str = "http://localhost:8080"
-    JENKINS_USERNAME: str = "admin"
-    JENKINS_PASSWORD: str = "admin"
+    JENKINS_URL: str = "https://osj-ngm-03-prd.cec.delllabs.net"
+    JENKINS_USERNAME: str = "svc_prdsysqafw"
+    JENKINS_PASSWORD: str = "jenkins-password-from-vault"
     JENKINS_JOB_NAME: str = "Trident/test_executer"
     JENKINS_DEV_JOB_NAME: str = "Trident/dev_test_executer"
     JENKINS_TIMEOUT: int = 300

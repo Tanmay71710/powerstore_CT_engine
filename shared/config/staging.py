@@ -50,10 +50,10 @@ class StagingConfig(BaseConfig):
     # Performance Database Configuration
     PERF_DATABASE_NAME = "performance_staging"
     
-    # Jenkins Configuration (Staging Jenkins)
-    JENKINS_URL = "https://staging-jenkins.dell.com"
-    JENKINS_USERNAME = "ct-engine-staging"
-    JENKINS_PASSWORD = "staging-jenkins-password-from-vault"
+    # Jenkins Configuration (Consistent across all environments)
+    JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net"
+    JENKINS_USERNAME = "svc_prdsysqafw"
+    JENKINS_PASSWORD = "jenkins-password-from-vault"
     JENKINS_TIMEOUT = 300
     JENKINS_RETRY_ATTEMPTS = 5
     

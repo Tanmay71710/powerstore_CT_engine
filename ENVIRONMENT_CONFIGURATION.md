@@ -46,6 +46,27 @@ XPOOL_RETRY_ATTEMPTS: int = 3
 - **Staging**: 50 concurrent reservations
 - **Production**: 100 concurrent reservations
 
+### Jenkins Configuration
+
+Jenkins configuration is consistent across all environments to ensure unified CI/CD integration:
+
+```python
+# Common Jenkins settings across all environments
+JENKINS_URL: str = "https://osj-ngm-03-prd.cec.delllabs.net"
+JENKINS_USERNAME: str = "svc_prdsysqafw"
+JENKINS_PASSWORD: str = "jenkins-password-from-vault"
+JENKINS_JOB_NAME: str = "Trident/test_executer"
+JENKINS_DEV_JOB_NAME: str = "Trident/dev_test_executer"
+```
+
+### Environment-Specific Jenkins Timeouts
+
+While the Jenkins server and credentials are consistent, timeout values vary by environment:
+
+- **Development**: 120 seconds (faster feedback for local development)
+- **Staging**: 300 seconds (standard timeout for pre-production)
+- **Production**: 600 seconds (longer timeout for production builds)
+
 ## Environment-Specific Docker Configuration
 
 Docker builds support environment-specific configurations through build arguments, enabling different base images, package sources, and installation methods per environment.
@@ -172,6 +193,7 @@ docker run -e ENV=staging myapp:staging
 
 **Characteristics**:
 - XPOOL: Development instance (`/dev/xpool`)
+- Jenkins: Production server with 120s timeout
 - Docker: Public PyPI, no reservation limits
 - Database: Local PostgreSQL, SSL disabled
 - Logging: DEBUG level with verbose output
@@ -186,6 +208,7 @@ docker run -e ENV=staging myapp:staging
 
 **Characteristics**:
 - XPOOL: Test instance (`/test/xpool`)
+- Jenkins: Production server with 300s timeout
 - Docker: Internal Artifactory, 50 reservation limit
 - Database: Staging database with SSL required
 - Logging: INFO level
@@ -200,6 +223,7 @@ docker run -e ENV=staging myapp:staging
 
 **Characteristics**:
 - XPOOL: Production instance (`/prd/xpool`)
+- Jenkins: Production server with 600s timeout
 - Docker: Internal Artifactory, 100 reservation limit
 - Database: Production database with SSL required
 - Logging: WARNING level (minimal output)

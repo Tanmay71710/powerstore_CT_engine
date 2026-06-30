@@ -44,10 +44,10 @@ class DevelopmentConfig(BaseConfig):
     # Performance Database Configuration
     PERF_DATABASE_NAME = "performance_dev"
     
-    # Jenkins Configuration (Development Jenkins)
-    JENKINS_URL = "http://localhost:8080"
-    JENKINS_USERNAME = "admin"
-    JENKINS_PASSWORD = "admin"
+    # Jenkins Configuration (Consistent across all environments)
+    JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net"
+    JENKINS_USERNAME = "svc_prdsysqafw"
+    JENKINS_PASSWORD = "jenkins-password-from-vault"
     JENKINS_TIMEOUT = 120  # Shorter timeout for development
     
     # LDAP Configuration (Development LDAP or mock)
