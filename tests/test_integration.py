@@ -10,7 +10,8 @@ import os
 from unittest.mock import patch
 
 import sys
-sys.path.insert(0, '/mnt/c/powerstore/All frameworks/ct engine/v4/powerstore_CT_engine')
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.environment import get_environment, get_environment_info
 from shared.config_loader import get_config, get_config_dict, get_database_uri

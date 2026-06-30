@@ -12,7 +12,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 import sys
-sys.path.insert(0, '/mnt/c/powerstore/All frameworks/ct engine/v4/powerstore_CT_engine')
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.feature_flags import (
     FeatureFlag,
