@@ -7,7 +7,7 @@ to ensure all required configuration is present and valid per environment.
 
 import re
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, validator, root_validator
+from pydantic import BaseModel, Field, field_validator, model_validator, ValidationError
 from enum import Enum
 import logging
 
@@ -34,7 +34,8 @@ class DatabaseConfig(BaseModel):
     pool_size: int = Field(default=5, ge=1, le=100, description="Connection pool size")
     max_overflow: int = Field(default=10, ge=0, le=50, description="Max overflow connections")
     
-    @validator('host')
+    @field_validator('host')
+    @classmethod
     def validate_host(cls, v):
         """Validate database host format"""
         if not re.match(r'^[\w\.\-]+$', v):
@@ -45,7 +46,8 @@ class DatabaseConfig(BaseModel):
             )
         return v
     
-    @validator('name')
+    @field_validator('name')
+    @classmethod
     def validate_name(cls, v):
         """Validate database name"""
         if not re.match(r'^[a-zA-Z0-9_]+$', v):
@@ -56,7 +58,8 @@ class DatabaseConfig(BaseModel):
             )
         return v
     
-    @validator('password')
+    @field_validator('password')
+    @classmethod
     def validate_password_strength(cls, v):
         """Validate password strength"""
         if len(v) < 8:
@@ -76,7 +79,8 @@ class JenkinsConfig(BaseModel):
     retry_attempts: int = Field(default=3, ge=0, le=10, description="Number of retry attempts")
     retry_delay: int = Field(default=5, ge=1, le=60, description="Retry delay in seconds")
     
-    @validator('url')
+    @field_validator('url')
+    @classmethod
     def validate_url(cls, v):
         """Validate Jenkins URL format"""
         if not re.match(r'^https?://', v):
@@ -97,7 +101,8 @@ class LDAPConfig(BaseModel):
     connect_timeout: int = Field(default=10, ge=1, le=60, description="Connection timeout")
     search_timeout: int = Field(default=5, ge=1, le=30, description="Search timeout")
     
-    @validator('url')
+    @field_validator('url')
+    @classmethod
     def validate_ldap_url(cls, v):
         """Validate LDAP URL format"""
         if not re.match(r'^ldaps?://', v):
@@ -119,16 +124,16 @@ class VaultConfig(BaseModel):
     token_ttl: int = Field(default=3600, ge=300, le=86400, description="Token TTL in seconds")
     cache_ttl: int = Field(default=300, ge=60, le=3600, description="Cache TTL in seconds")
     
-    @validator('url')
-    def validate_vault_url(cls, v, values):
+    @model_validator(mode='after')
+    def validate_vault_url(self):
         """Validate Vault URL format if Vault is enabled"""
-        if values.get('enabled') and not re.match(r'^https?://', v):
+        if self.enabled and self.url and not re.match(r'^https?://', self.url):
             raise ConfigurationValidationError(
-                f"Vault URL must start with http:// or https:// when enabled: {v}",
+                f"Vault URL must start with http:// or https:// when enabled: {self.url}",
                 field_name="url",
-                value=v
+                value=self.url
             )
-        return v
+        return self
 
 
 class SecurityConfig(BaseModel):
@@ -138,7 +143,8 @@ class SecurityConfig(BaseModel):
     session_cookie_httponly: bool = Field(default=True, description="HTTP only cookies")
     session_samesite: str = Field(default="Lax", description="SameSite cookie policy")
     
-    @validator('secret_key')
+    @field_validator('secret_key')
+    @classmethod
     def validate_secret_key(cls, v):
         """Validate secret key strength"""
         if len(v) < 32:
@@ -148,7 +154,8 @@ class SecurityConfig(BaseModel):
             )
         return v
     
-    @validator('session_samesite')
+    @field_validator('session_samesite')
+    @classmethod
     def validate_samesite(cls, v):
         """Validate SameSite policy"""
         valid_values = ['Strict', 'Lax', 'None']
@@ -171,21 +178,21 @@ class AppConfig(BaseModel):
     vault: VaultConfig
     security: SecurityConfig
     
-    @root_validator
-    def validate_production_settings(cls, values):
+    @model_validator(mode='after')
+    def validate_production_settings(self):
         """Validate production-specific security requirements"""
-        if values.get('environment') == Environment.PRODUCTION:
-            if values.get('debug'):
+        if self.environment == Environment.PRODUCTION:
+            if self.debug:
                 raise ConfigurationValidationError(
                     "DEBUG must be False in production",
                     field_name="debug"
                 )
-            if not values.get('security').session_cookie_secure:
+            if not self.security.session_cookie_secure:
                 raise ConfigurationValidationError(
                     "SESSION_COOKIE_SECURE must be True in production",
                     field_name="session_cookie_secure"
                 )
-        return values
+        return self
 
 
 class ConfigValidator:
@@ -224,52 +231,67 @@ class ConfigValidator:
             # Convert environment string to enum
             env_enum = Environment(environment)
             
-            # Build configuration model
-            app_config = AppConfig(
-                environment=env_enum,
-                debug=config_dict.get('DEBUG', False),
-                database=DatabaseConfig(
-                    host=config_dict.get('DATABASE_HOST', ''),
-                    port=config_dict.get('DATABASE_PORT', 5432),
-                    name=config_dict.get('DATABASE_NAME', ''),
-                    user=config_dict.get('DATABASE_USER', ''),
-                    password=config_dict.get('DATABASE_PASSWORD', ''),
-                    ssl_mode=config_dict.get('DATABASE_SSL_MODE', 'prefer'),
-                    pool_size=config_dict.get('DATABASE_POOL_SIZE', 5),
-                    max_overflow=config_dict.get('DATABASE_MAX_OVERFLOW', 10)
-                ),
-                jenkins=JenkinsConfig(
-                    url=config_dict.get('JENKINS_URL', ''),
-                    username=config_dict.get('JENKINS_USERNAME', ''),
-                    password=config_dict.get('JENKINS_PASSWORD', ''),
-                    timeout=config_dict.get('JENKINS_TIMEOUT', 300),
-                    retry_attempts=config_dict.get('JENKINS_RETRY_ATTEMPTS', 3),
-                    retry_delay=config_dict.get('JENKINS_RETRY_DELAY', 5)
-                ),
-                ldap=LDAPConfig(
-                    url=config_dict.get('LDAP_URL', ''),
-                    base_dn=config_dict.get('LDAP_BASE_DN', ''),
-                    bind_dn=config_dict.get('LDAP_BIND_DN', ''),
-                    use_ssl=config_dict.get('LDAP_USE_SSL', True),
-                    connect_timeout=config_dict.get('LDAP_CONNECT_TIMEOUT', 10),
-                    search_timeout=config_dict.get('LDAP_SEARCH_TIMEOUT', 5)
-                ),
-                vault=VaultConfig(
-                    enabled=config_dict.get('VAULT_ENABLED', False),
-                    url=config_dict.get('VAULT_URL', ''),
-                    role=config_dict.get('VAULT_ROLE', ''),
-                    secret_path=config_dict.get('VAULT_SECRET_PATH', ''),
-                    auth_method=config_dict.get('VAULT_AUTH_METHOD', 'kubernetes'),
-                    token_ttl=config_dict.get('VAULT_TOKEN_TTL', 3600),
-                    cache_ttl=config_dict.get('VAULT_SECRET_CACHE_TTL', 300)
-                ),
-                security=SecurityConfig(
-                    secret_key=config_dict.get('SECRET_KEY', ''),
-                    session_cookie_secure=config_dict.get('SESSION_COOKIE_SECURE', False),
-                    session_cookie_httponly=config_dict.get('SESSION_COOKIE_HTTPONLY', True),
-                    session_samesite=config_dict.get('SESSION_COOKIE_SAMESITE', 'Lax')
+            # Build configuration model with Pydantic V2 error handling
+            try:
+                app_config = AppConfig(
+                    environment=env_enum,
+                    debug=config_dict.get('DEBUG', False),
+                    database=DatabaseConfig(
+                        host=config_dict.get('DATABASE_HOST', ''),
+                        port=config_dict.get('DATABASE_PORT', 5432),
+                        name=config_dict.get('DATABASE_NAME', ''),
+                        user=config_dict.get('DATABASE_USER', ''),
+                        password=config_dict.get('DATABASE_PASSWORD', ''),
+                        ssl_mode=config_dict.get('DATABASE_SSL_MODE', 'prefer'),
+                        pool_size=config_dict.get('DATABASE_POOL_SIZE', 5),
+                        max_overflow=config_dict.get('DATABASE_MAX_OVERFLOW', 10)
+                    ),
+                    jenkins=JenkinsConfig(
+                        url=config_dict.get('JENKINS_URL', ''),
+                        username=config_dict.get('JENKINS_USERNAME', ''),
+                        password=config_dict.get('JENKINS_PASSWORD', ''),
+                        timeout=config_dict.get('JENKINS_TIMEOUT', 300),
+                        retry_attempts=config_dict.get('JENKINS_RETRY_ATTEMPTS', 3),
+                        retry_delay=config_dict.get('JENKINS_RETRY_DELAY', 5)
+                    ),
+                    ldap=LDAPConfig(
+                        url=config_dict.get('LDAP_URL', ''),
+                        base_dn=config_dict.get('LDAP_BASE_DN', ''),
+                        bind_dn=config_dict.get('LDAP_BIND_DN', ''),
+                        use_ssl=config_dict.get('LDAP_USE_SSL', True),
+                        connect_timeout=config_dict.get('LDAP_CONNECT_TIMEOUT', 10),
+                        search_timeout=config_dict.get('LDAP_SEARCH_TIMEOUT', 5)
+                    ),
+                    vault=VaultConfig(
+                        enabled=config_dict.get('VAULT_ENABLED', False),
+                        url=config_dict.get('VAULT_URL', ''),
+                        role=config_dict.get('VAULT_ROLE', ''),
+                        secret_path=config_dict.get('VAULT_SECRET_PATH', ''),
+                        auth_method=config_dict.get('VAULT_AUTH_METHOD', 'kubernetes'),
+                        token_ttl=config_dict.get('VAULT_TOKEN_TTL', 3600),
+                        cache_ttl=config_dict.get('VAULT_SECRET_CACHE_TTL', 300)
+                    ),
+                    security=SecurityConfig(
+                        secret_key=config_dict.get('SECRET_KEY', ''),
+                        session_cookie_secure=config_dict.get('SESSION_COOKIE_SECURE', False),
+                        session_cookie_httponly=config_dict.get('SESSION_COOKIE_HTTPONLY', True),
+                        session_samesite=config_dict.get('SESSION_COOKIE_SAMESITE', 'Lax')
+                    )
                 )
-            )
+            except ValidationError as e:
+                # Convert Pydantic V2 validation errors to our format
+                for error in e.errors():
+                    field_name = '.'.join(str(loc) for loc in error['loc']) if error['loc'] else 'general'
+                    message = error['msg']
+                    input_value = error.get('input') if 'input' in error else None
+                    self._errors.append(ConfigurationValidationError(
+                        f"{field_name}: {message}",
+                        field_name=field_name,
+                        value=input_value
+                    ))
+                raise ConfigurationValidationError(
+                    f"Configuration validation failed: {str(e)}"
+                )
             
             # Environment-specific validation
             self._validate_environment_specific(config_dict, env_enum)

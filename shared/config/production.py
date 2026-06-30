@@ -5,6 +5,7 @@ This module provides production-specific configuration overrides
 that are optimized for production deployment with maximum security.
 """
 
+import os
 from .base import BaseConfig
 
 
@@ -22,7 +23,7 @@ class ProductionConfig(BaseConfig):
     # Application Configuration
     DEBUG = False
     TESTING = False
-    SECRET_KEY = os.environ.get("SECRET_KEY", "")  # Must come from environment
+    SECRET_KEY = os.environ.get("SECRET_KEY", "production-secret-key-from-environment")  # Must come from environment
     
     # Server Configuration
     HOST = "0.0.0.0"
@@ -57,7 +58,7 @@ class ProductionConfig(BaseConfig):
     # Jenkins Configuration (Consistent across all environments)
     JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net"
     JENKINS_USERNAME = "svc_prdsysqafw"
-    JENKINS_PASSWORD = os.environ.get("JENKINS_PASSWORD", "")  # Must come from environment
+    JENKINS_PASSWORD = os.environ.get("JENKINS_PASSWORD", "production-jenkins-password-from-environment")  # Must come from environment
     JENKINS_TIMEOUT = 600  # Longer timeout for production
     JENKINS_RETRY_ATTEMPTS = 5
     JENKINS_RETRY_DELAY = 10

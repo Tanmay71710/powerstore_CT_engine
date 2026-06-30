@@ -5,6 +5,7 @@ This module provides staging-specific configuration overrides
 that are optimized for pre-production testing and validation.
 """
 
+import os
 from .base import BaseConfig
 
 
@@ -57,7 +58,7 @@ class StagingConfig(BaseConfig):
     # Jenkins Configuration (Consistent across all environments)
     JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net"
     JENKINS_USERNAME = "svc_prdsysqafw"
-    JENKINS_PASSWORD = os.environ.get("JENKINS_PASSWORD", "")
+    JENKINS_PASSWORD = os.environ.get("JENKINS_PASSWORD", "staging-jenkins-password")
     JENKINS_TIMEOUT = 300
     JENKINS_RETRY_ATTEMPTS = 5
     

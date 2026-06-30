@@ -5,6 +5,7 @@ This module provides development-specific configuration overrides
 that are optimized for local development and testing.
 """
 
+import os
 from .base import BaseConfig
 
 
@@ -51,7 +52,7 @@ class DevelopmentConfig(BaseConfig):
     # Jenkins Configuration (Consistent across all environments)
     JENKINS_URL = "https://osj-ngm-03-prd.cec.delllabs.net"
     JENKINS_USERNAME = "svc_prdsysqafw"
-    JENKINS_PASSWORD = os.environ.get("JENKINS_PASSWORD", "")
+    JENKINS_PASSWORD = os.environ.get("JENKINS_PASSWORD", "dev-jenkins-password")
     JENKINS_TIMEOUT = 120  # Shorter timeout for development
     
     # LDAP Configuration (Development LDAP or mock)
