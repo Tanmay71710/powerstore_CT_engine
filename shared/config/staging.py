@@ -70,7 +70,7 @@ class StagingConfig(BaseConfig):
     
     # XPool Configuration (Staging XPool)
     XPOOL_ENABLED = True
-    XPOOL_BINARY_PATH = "/home/public/scripts/xpool_trident/prd/xpool"
+    XPOOL_BINARY_PATH = "/home/public/scripts/xpool_trident/test/xpool"
     XPOOL_GROUPS = "QA-TestRunner,FRAMEWORK"
     XPOOL_DEFAULT_USER = "svc_prdsysqafw"
     XPOOL_RESERVATION_LIMIT = 50

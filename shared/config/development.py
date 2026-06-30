@@ -61,7 +61,7 @@ class DevelopmentConfig(BaseConfig):
     
     # XPool Configuration (Mock or development instance)
     XPOOL_ENABLED = True
-    XPOOL_BINARY_PATH = "/home/public/scripts/xpool_trident/prd/xpool"
+    XPOOL_BINARY_PATH = "/home/public/scripts/xpool_trident/dev/xpool"
     XPOOL_GROUPS = "QA-TestRunner,FRAMEWORK"
     XPOOL_DEFAULT_USER = "svc_prdsysqafw"
     XPOOL_RESERVATION_LIMIT = None
